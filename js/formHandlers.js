@@ -50,6 +50,7 @@ export function addInputListener(inputElement, label) {
   });
 }
 
+
 // Submit form data on button click with corrected error handling
 export function handleSubmitButton(apiUrl) {
   const submitButton = document.getElementById('submitButton');
@@ -58,15 +59,22 @@ export function handleSubmitButton(apiUrl) {
     event.preventDefault();
     const formData = collectFormData();
 
-    console.log(`form data ${formData.f51}`)
+    console.log(`form data ${formData.f11}`);
 
     try {
       const { ok, status, data } = await postFormData(apiUrl, formData);
 
-      if (ok) { 
-        window.name = JSON.stringify(data);
+      if (ok) {
+        const payload = {
+          data,             // API response data
+          f11: formData.f11 // Include formData.f11
+        };
 
-        //window.location.href = '../result.html';
+        // ✅ Store data in localStorage instead of window.name
+        localStorage.setItem('resultData', JSON.stringify(payload));
+
+        // ✅ Redirect to result.html
+        window.location.href = '../result.html';
       } else {
         alert(`Error::: ${data.message || 'An error occurred while submitting the form.'}`);
       }
@@ -75,7 +83,6 @@ export function handleSubmitButton(apiUrl) {
     }
   });
 }
-
 
 // --------submit-button-validation--
 

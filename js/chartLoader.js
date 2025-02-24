@@ -1,35 +1,40 @@
 document.addEventListener('DOMContentLoaded', function () {
   const resultContainer = document.getElementById('resultContainer');
   const companyName = document.getElementById('cityOrCounty');
+  const stateName = document.getElementById('stateName');
 
   try {
-    // ✅ `window.name` से डेटा लोड करें
-    const storedData = JSON.parse(window.name);
+    // ✅ Load data from localStorage
+    const storedData = JSON.parse(localStorage.getItem('resultData'));
 
     if (!storedData || !storedData.data) {
       throw new Error('Invalid data received');
     }
 
-    // ✅ पहला कंपनी नाम प्राप्त करें
-    const companyNameValue = storedData.data.NoOfEmployees[0]['company-1'];
+    console.log('Received full data:', storedData);
+    console.log('Received formData.f11:', storedData.f11);
 
-    // ✅ डेटा UI में दिखाएं
+    // ✅ Display first company name
+    const companyNameValue = storedData.data.data.NoOfEmployees[0]['company-1'];
     companyName.innerHTML = `<p>${companyNameValue}</p>`;
+    stateName.innerHTML = `<p>${storedData.f11}</p>`;
 
-    // ✅ डेटा को चार्ट में पास करें
-    loadEmployeeChartData(storedData.data.NoOfEmployees);
-    loadVehicleChartData(storedData.data.noOfVehicles);
-    loadEmployeeCostsChartData(storedData.data.empCost);
-    loadVehicleCostsChartData(storedData.data.vehicleCost);
-    loadSavingsChartData(storedData.data.savingPerWeek);
-    loadSavingsYearChartData(storedData.data.savingPerYear);
-    loadActionPieChartData(storedData.data.Action);
+    // ✅ Pass data to charts
+    loadEmployeeChartData(storedData.data.data.NoOfEmployees);
+    loadVehicleChartData(storedData.data.data.noOfVehicles);
+    loadEmployeeCostsChartData(storedData.data.data.empCost);
+    loadVehicleCostsChartData(storedData.data.data.vehicleCost);
+    loadSavingsChartData(storedData.data.data.savingPerWeek);
+    loadSavingsYearChartData(storedData.data.data.savingPerYear);
+    loadActionPieChartData(storedData.data.data.Action);
 
-    // ✅ डेटा को क्लियर करें (ताकि रीफ्रेश करने पर डेटा न रहे)
-    window.name = '';
+    // ✅ Clear localStorage data to avoid stale data on refresh (optional)
+    
   } catch (error) {
     console.error('Error receiving data:', error);
-    resultContainer.innerHTML = '<p>Error receiving data.</p>';
+    if (resultContainer) {
+      resultContainer.innerHTML = '<p>Error receiving data.</p>';
+    }
   }
 });
 
@@ -216,62 +221,61 @@ async function loadVehicleChartData(noOfVehicles) {
   }
 }
 
-
 // --------------bar-chart-of-employee-costs---js---
 
 async function loadEmployeeCostsChartData(empCost) {
   try {
     // Validate incoming data
     if (!empCost || !Array.isArray(empCost)) {
-      throw new Error("Invalid Employee Cost Data");
+      throw new Error('Invalid Employee Cost Data');
     }
 
     // Extract labels dynamically
     const labels = empCost.map((entry) => {
-      const companyKey = Object.keys(entry).find((key) => key.startsWith("empC"));
-      return entry[companyKey] || "Unknown Company";
+      const companyKey = Object.keys(entry).find((key) => key.startsWith('empC'));
+      return entry[companyKey] || 'Unknown Company';
     });
 
     // Extract and format Wages
     const wagesData = empCost.map((entry) => {
-      const wagesKey = Object.keys(entry).find((key) => key.startsWith("PersonnelCostWages"));
+      const wagesKey = Object.keys(entry).find((key) => key.startsWith('PersonnelCostWages'));
       return parseFloat(entry[wagesKey] || 0).toFixed(2);
     });
 
     // Extract and format Benefits
     const benefitsData = empCost.map((entry) => {
-      const benefitsKey = Object.keys(entry).find((key) => key.startsWith("PersonnelCostBenefits"));
+      const benefitsKey = Object.keys(entry).find((key) => key.startsWith('PersonnelCostBenefits'));
       return parseFloat(entry[benefitsKey] || 0).toFixed(2);
     });
 
     // Chart.js setup
-    const ctx3 = document.getElementById("EmployeeCost").getContext("2d");
+    const ctx3 = document.getElementById('EmployeeCost').getContext('2d');
 
     new Chart(ctx3, {
-      type: "bar",
+      type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
-            label: "Wages",
+            label: 'Wages',
             data: wagesData,
-            backgroundColor: "#2c1e1e",
+            backgroundColor: '#2c1e1e',
           },
           {
-            label: "Benefits",
+            label: 'Benefits',
             data: benefitsData,
-            backgroundColor: "#5DADE2",
+            backgroundColor: '#5DADE2',
           },
         ],
       },
       options: {
-        indexAxis: "y", // Horizontal bar chart
+        indexAxis: 'y', // Horizontal bar chart
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
             display: true,
-            position: "bottom",
+            position: 'bottom',
           },
           tooltip: {
             enabled: true,
@@ -293,11 +297,11 @@ async function loadEmployeeCostsChartData(empCost) {
           },
           datalabels: {
             display: true, // Display data labels
-            anchor: "center",
-            align: "center",
-            color: "white",
+            anchor: 'center',
+            align: 'center',
+            color: 'white',
             font: {
-              weight: "bold",
+              weight: 'bold',
               size: 10,
             },
             formatter: (value) =>
@@ -320,7 +324,7 @@ async function loadEmployeeCostsChartData(empCost) {
       plugins: [ChartDataLabels], // Enable Data Labels Plugin
     });
   } catch (error) {
-    console.error("Error generating Employee Costs Chart:", error);
+    console.error('Error generating Employee Costs Chart:', error);
   }
 }
 
@@ -330,66 +334,66 @@ async function loadVehicleCostsChartData(vehicleCost) {
   try {
     // Validate incoming data
     if (!vehicleCost || !Array.isArray(vehicleCost)) {
-      throw new Error("Invalid Vehicle Cost Data");
+      throw new Error('Invalid Vehicle Cost Data');
     }
 
     // Extract Labels and Data Dynamically
     const labels = vehicleCost.map((entry) => {
-      const companyKey = Object.keys(entry).find((key) => key === "county" || key === "cart");
-      return entry[companyKey] || "Unknown Company";
+      const companyKey = Object.keys(entry).find((key) => key === 'county' || key === 'cart');
+      return entry[companyKey] || 'Unknown Company';
     });
 
     // Extract and format Truck Cost
     const truckCostData = vehicleCost.map((entry) => {
-      const truckCostKey = Object.keys(entry).find((key) => key.includes("truckCost"));
+      const truckCostKey = Object.keys(entry).find((key) => key.includes('truckCost'));
       return parseFloat(entry[truckCostKey] || 0).toFixed(2);
     });
 
     // Extract and format Fuel Cost
     const fuelData = vehicleCost.map((entry) => {
-      const fuelKey = Object.keys(entry).find((key) => key.includes("fuel"));
+      const fuelKey = Object.keys(entry).find((key) => key.includes('fuel'));
       return parseFloat(entry[fuelKey] || 0).toFixed(2);
     });
 
     // Extract and format Maintenance & Insurance Cost
     const maintenanceData = vehicleCost.map((entry) => {
-      const maintKey = Object.keys(entry).find((key) => key.includes("maintInsurance"));
+      const maintKey = Object.keys(entry).find((key) => key.includes('maintInsurance'));
       return parseFloat(entry[maintKey] || 0).toFixed(2);
     });
 
     // Chart.js setup
-    const ctx4 = document.getElementById("VehicleCost").getContext("2d");
+    const ctx4 = document.getElementById('VehicleCost').getContext('2d');
 
     new Chart(ctx4, {
-      type: "bar",
+      type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
-            label: "Truck Cost",
+            label: 'Truck Cost',
             data: truckCostData,
-            backgroundColor: "#2c3e50",
+            backgroundColor: '#2c3e50',
           },
           {
-            label: "Fuel",
+            label: 'Fuel',
             data: fuelData,
-            backgroundColor: "#5DADE2",
+            backgroundColor: '#5DADE2',
           },
           {
-            label: "Maint, Insurance, Etc...",
+            label: 'Maint, Insurance, Etc...',
             data: maintenanceData,
-            backgroundColor: "#8B7D6B",
+            backgroundColor: '#8B7D6B',
           },
         ],
       },
       options: {
-        indexAxis: "y", // Horizontal bar chart
+        indexAxis: 'y', // Horizontal bar chart
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
           legend: {
             display: true,
-            position: "bottom",
+            position: 'bottom',
           },
           tooltip: {
             enabled: true,
@@ -412,16 +416,16 @@ async function loadVehicleCostsChartData(vehicleCost) {
           datalabels: {
             display: true,
             anchor: function (context) {
-              return context.dataset.data[context.dataIndex] < 100 ? "end" : "center"; // Move small values outside
+              return context.dataset.data[context.dataIndex] < 100 ? 'end' : 'center'; // Move small values outside
             },
             align: function (context) {
-              return context.dataset.data[context.dataIndex] < 100 ? "end" : "center"; // Align small values outside
+              return context.dataset.data[context.dataIndex] < 100 ? 'end' : 'center'; // Align small values outside
             },
             color: function (context) {
-              return context.dataset.data[context.dataIndex] < 100 ? "#000" : "#fff"; // Dark text for small values
+              return context.dataset.data[context.dataIndex] < 100 ? '#000' : '#fff'; // Dark text for small values
             },
             font: {
-              weight: "bold",
+              weight: 'bold',
               size: 10,
             },
             formatter: (value) =>
@@ -444,7 +448,7 @@ async function loadVehicleCostsChartData(vehicleCost) {
       plugins: [ChartDataLabels], // Enable Data Labels Plugin
     });
   } catch (error) {
-    console.error("Error generating Vehicle Costs Chart:", error);
+    console.error('Error generating Vehicle Costs Chart:', error);
   }
 }
 
@@ -454,7 +458,7 @@ async function loadSavingsChartData(savingPerWeek) {
   try {
     // Validate incoming data
     if (!savingPerWeek || !Array.isArray(savingPerWeek)) {
-      throw new Error("Invalid Saving Per Week Data");
+      throw new Error('Invalid Saving Per Week Data');
     }
 
     // Extract Labels and Data
@@ -462,7 +466,7 @@ async function loadSavingsChartData(savingPerWeek) {
     const savingsData = [];
 
     // Keys to be plotted
-    const keysToPlot = ["countyCoS", "Employee", "Vehicle", "Other", "NCSCoS"];
+    const keysToPlot = ['countyCoS', 'Employee', 'Vehicle', 'Other', 'NCSCoS'];
 
     savingPerWeek.forEach((entry) => {
       keysToPlot.forEach((key) => {
@@ -474,22 +478,23 @@ async function loadSavingsChartData(savingPerWeek) {
     });
 
     // Chart.js setup
-    const ctx5 = document.getElementById("monthSaving").getContext("2d");
+    const ctx5 = document.getElementById('monthSaving').getContext('2d');
 
     new Chart(ctx5, {
-      type: "bar",
+      type: 'bar',
       data: {
         labels: labels,
         datasets: [
           {
-            label: "Savings",
+            label: 'Savings',
             data: savingsData,
-            backgroundColor: savingsData.map((value) =>
-              value < 0
-                ? "rgba(93, 173, 226, 0.5)" // Light blue for negative values
-                : value > 15000
-                ? "#1C1C1C" // Darker for high values
-                : "#5DADE2" // Default blue
+            backgroundColor: savingsData.map(
+              (value) =>
+                value < 0
+                  ? 'rgba(93, 173, 226, 0.5)' // Light blue for negative values
+                  : value > 15000
+                  ? '#1C1C1C' // Darker for high values
+                  : '#5DADE2', // Default blue
             ),
           },
         ],
@@ -516,28 +521,37 @@ async function loadSavingsChartData(savingPerWeek) {
                 return `Point: "${tooltipItem.label}"`; // Key inside quotes
               },
               afterLabel: (tooltipItem) => {
-                return `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                return `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`;
               },
             },
           },
           datalabels: {
             color: function (context) {
-              return context.dataset.data[context.dataIndex] > 15000 ? "#fff" : "#000"; // White text for dark bars
+              return context.dataset.data[context.dataIndex] > 15000 ? '#fff' : '#000'; // White text for dark bars
             },
             font: {
-              weight: "bold",
+              weight: 'bold',
               size: 10,
             },
             formatter: function (value) {
               return value < 0
-                ? `$(${Math.abs(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`
-                : `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                ? `$(${Math.abs(value).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })})`
+                : `$${Number(value).toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}`;
             },
             anchor: function (context) {
-              return context.dataset.data[context.dataIndex] > 15000 ? "end" : "center"; // Adjust anchor for big values
+              return context.dataset.data[context.dataIndex] > 15000 ? 'end' : 'center'; // Adjust anchor for big values
             },
             align: function (context) {
-              return context.dataset.data[context.dataIndex] > 15000 ? "start" : "top"; // Push large values slightly down
+              return context.dataset.data[context.dataIndex] > 15000 ? 'start' : 'top'; // Push large values slightly down
             },
           },
         },
@@ -551,7 +565,10 @@ async function loadSavingsChartData(savingPerWeek) {
             beginAtZero: true,
             ticks: {
               callback: function (value) {
-                return `$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                return `$${Number(value).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}`;
               },
             },
           },
@@ -560,7 +577,7 @@ async function loadSavingsChartData(savingPerWeek) {
       plugins: [ChartDataLabels], // Enable Data Labels Plugin
     });
   } catch (error) {
-    console.error("Error loading Savings JSON data:", error);
+    console.error('Error loading Savings JSON data:', error);
   }
 }
 
@@ -717,7 +734,7 @@ async function loadActionPieChartData(Action) {
               weight: 'bold',
               size: 10,
             },
-            formatter: (value) => `${Number(value).toFixed(2)}%`,
+            formatter: (value) => `$${Number(value).toFixed(2)}`,
           },
         },
       },
@@ -750,7 +767,7 @@ async function loadActionPieChartData(Action) {
       legendItem.style.margin = '5px 10px';
 
       const colorBox = document.createElement('span');
-      
+
       colorBox.style.width = '12px';
       colorBox.style.height = '12px';
       colorBox.style.backgroundColor = backgroundColors[index]; // Ensure correct color is applied
