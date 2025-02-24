@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solid Waste & Recycling Cart Management</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome Latest -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="costCalculator.css">
+</head>
+
+<body>
+
+    <header class="header-area header">
+        <!-- site-navbar start -->
+        <div class="navbar-area ">
+            <div class="header-announcement-bar-wrapper">
+                <nav class="site-navbar">
+                    <!-- site logo -->
+                    <a href="https://www.nationalcartservices.com/" class="header-title-logo"><img
+                            src="images/Logo+with+Tagline+-+White.png" alt="Logo"></a>
+                    <!-- site menu/nav -->
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="https://www.nationalcartservices.com/services">Service</a></li>
+                        <li><a href="https://www.nationalcartservices.com/carts-as-a-service">Cart as a Service</a></li>
+                        <li><a href="https://www.nationalcartservices.com/contact-us" class=""><button
+                                    class="btn-custom py-2">Contact</button></a></li>
+                    </ul>
+
+                    <!-- nav-toggler for mobile version only -->
+                    <button class="nav-toggler">
+                        <span></span>
+                    </button>
+                </nav>
+            </div>
+        </div><!-- navbar-area end -->
+
+        <div class="intro-area mt-2 mb-5 header-announcement-bar-wrapper2">
+            <div class="row m-0">
+                <div class="col-md-7">
+                    <h2>Residential Waste &<br> Recycling Cart Management</h2>
+                </div>
+                <div class="col-md-5">
+                    <p>Providing world-class cart management services to municipalities across the United States</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+
+    <!-- Main Page Content Here -->
+    <div class="bg-img">
+        <div class="caculator-content mb-5 ">
+
+            <h2 class="heading-upper text-center mt-5">Cost Calculator</h2>
+
+            <p class="info-heading"><i class="fa-solid fa-star"></i> The information below is the minimum needed
+                to estimate the annual cost to manage your cart fleet. The
+                accuracy of this estimate will increase if you add the "Optional Information" in the next section</p>
+            <!-- <p class="para-heading mt-3"></p> -->
+            <div class="" id="fillCost">
+                <form class="p-0" id="myForm">
+                    <div class="row m-0 p-0" id="leftSide">
+                        <div class="col-md-6">
+                            <div class="left-side">
+                                <div class="card p-3">
+
+                                    <h2 class="mb-2 inner-heading mancolor">Mandatory information</h2>
+                                    <hr class="my-1 manhr">
+                                    <h4 class="mb-2 mt-3 inner-heading">Geography</h4>
+                                    <hr class="my-1">
+
+                                    <div class="label-content">
+                                        <div class="data-content">
+                                            <p for="publicPrivate">Is the entity performing cart management Public or
+                                                Private?</p>
+                                            <select class="form-select mb-3" id="publicPrivateSelect"
+                                                aria-label=". example">
+                                                <option class="option" value="" selected>Select option</option>
+                                                <option class="option" value="Public" id>Public</option>
+                                                <option class="option" value="Private">Private</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="data-content">
+                                            <p>Is the entity performing cart management City or County based?</p>
+                                            <select id="cityCountySelect" class="form-select mb-3" required>
+                                                <option class="option" value="" selected>Select option</option>
+                                                <option class="option" value="City">City</option>
+                                                <option class="option" value="County">County</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="data-content">
+                                            <p id="stateLabel">In what state is the service being performed?</p>
+                                            <select id="stateDropdown" class="form-select mb-3" disabled required>
+                                                <option class="option" value="" selected>Select a State</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="data-content">
+                                            <p id="locationLabel">In what County is the service being performed?</p>
+                                            <select id="cityCounty" class="form-select mb-3" disabled required>
+                                                <option class="option" value="" selected>Select Option</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- ---Next---- -->
+
+                                    <div class="data-2 mt-4">
+                                        <h4 class="mb-2 inner-heading">Operations & Staffing</h4>
+                                        <hr class="my-1">
+                                        <div class="label-content row mt-3">
+
+                                            <div class="col-md-6 tooltip-col">
+                                                <div class="data-content">
+                                                    <p>
+                                                        # of Carts in Fleet:
+                                                        <span class="tooltip-container">
+                                                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                                            <span class="tooltip-text">Enter the approximate number of
+                                                                carts managed by the entity performing cart
+                                                                services</span>
+                                                        </span>
+                                                    </p>
+                                                    <input type="number" id="cartsFleet" class="form-control  mb-3"
+                                                        aria-label="Large input example" placeholder="0" required>
+                                                </div>
+
+                                                <div class="data-content">
+                                                    <p>
+                                                        Total # of Employees:
+                                                        <span class="tooltip-container">
+                                                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                                            <span class="tooltip-text">All Direct Labor for the site
+                                                                including those performing actions along with
+                                                                supervisors/mangers that are managing the site either in
+                                                                whole or in-part (can include fractions of FTE's)</span>
+                                                        </span>
+                                                    </p>
+                                                    <input type="number" id="totalEmployee" class="form-control  mb-3"
+                                                        aria-label="Large input example" placeholder="0" required>
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="col-md-6">
+                                                <div class="data-content">
+                                                    <p for=""># of Actions/Day:
+                                                        <span class="tooltip-container">
+                                                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                                            <span class="tooltip-text">Enter the estimated average # of
+                                                                actions performed on a daily basis during normal
+                                                                business hours</span>
+                                                        </span>
+                                                    </p>
+
+                                                    <input type="number" id="numActions" class="form-control  mb-3"
+                                                        aria-label="Large input example" placeholder="0" required>
+                                                </div>
+                                                <div class="deta-content">
+                                                    <p for="numVehicle"># of Vehicles:
+                                                        <span class="tooltip-container">
+                                                            <i class="fa-solid fa-circle-info tooltip-icon"></i>
+                                                            <span class="tooltip-text">Enter the # of vehicles used by
+                                                                your cart management team (can include fractions of
+                                                                trucks)</span>
+                                                        </span>
+                                                    </p>
+                                                    <input type="number" id="numVehicles" class="form-control  mb-3"
+                                                        aria-label="Large input example" placeholder="0" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="opt-info mt-4 p-3">
+                                    <span class="d-flex justify-content-between">
+                                        <h4 class="inner-heading optcolor">Optional Information</h4>
+                                        <button class="btn btn-custom" id="toggleBtn"><i
+                                                class="fa-solid fa-minus"></i></button>
+                                    </span>
+
+                                    <hr class="my-1 opthr">
+                                    <!-- Add a unique ID for this specific label-content div -->
+                                    <div class="label-content row mt-3" id="specificLabelContent">
+                                        <span class="info-heading px-3"><i class="fa-solid fa-circle-info"></i>
+                                            Enter the additional optional information. All inputs below are not required
+                                            but
+                                            the
+                                            more information entered the greater the accuracy of the estimate.
+                                        </span>
+
+                                        <div class="">
+
+                                            <h4 class="inner-heading mt-3">Employee Classification:</h4>
+                                            <div class="data-content">
+                                                <p for="payRates">Will you enter hourly or annual pay rates?:</p>
+                                                <select class="form-select  mb-3" aria-label=". example"
+                                                    id="payRateSelect">
+                                                    <option selected>Select option</option>
+                                                    <option value="Hourly">Hourly</option>
+                                                    <option value="Annual">Annual</option>
+                                                </select>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="info-text">
+
+                                            Enter the average wage rate only - do
+                                            input an hourly rate that includes benefits, insurance,
+                                            etc…
+                                        </div>
+
+                                        <div class="col-md-7">
+                                            <p for="actionsCalls" class="ellipsis-text">Employees Performing Service
+                                                Actions/Calls:</p>
+                                            <input type="number" id="actionsCalls" class="form-control mb-3"
+                                                aria-label="Large input example" placeholder="0">
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <!-- Action Hourly Rate -->
+                                            <div>
+                                                <p for="actionsRate">Hourly Rate:</p>
+                                                <div class="input-with-dollar">
+                                                    <span class="dollar-symbol">$</span>
+                                                    <input type="number" id="actionCallRate"
+                                                        class="form-control mb-3 hourly-rate"
+                                                        aria-label="Large input example">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-7">
+                                            <p for="SupManagers">Supervisors/Managers:</p>
+                                            <input type="number" id="SupManagers" class="form-control mb-3"
+                                                aria-label="Large input example" placeholder="0">
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <!-- Supervisor/Manager Hourly Rate -->
+                                            <div>
+                                                <p for="SupManagRate">Hourly Rate:</p>
+                                                <div class="input-with-dollar">
+                                                    <span class="dollar-symbol">$</span>
+                                                    <input type="number" id="SupManagRate"
+                                                        class="form-control mb-3 hourly-rate"
+                                                        aria-label="Large input example">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-7">
+                                            <p for="Other">Other:</p>
+                                            <input type="number" id="Other" class="form-control mb-3"
+                                                aria-label="Large input example" placeholder="0">
+                                        </div>
+
+                                        <div class="col-md-5">
+                                            <!-- Other Hourly Rate -->
+                                            <div>
+                                                <p for="otherRate">Hourly Rate: </p>
+                                                <div class="input-with-dollar">
+                                                    <span class="dollar-symbol">$</span>
+                                                    <input type="number" id="otherRate"
+                                                        class="form-control mb-3 hourly-rate"
+                                                        aria-label="Large input example">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-12">
+                                            <p for="totalValue" class="">Total:</p>
+                                            <div class="">
+
+                                                <input type="number" id="total" class="form-control mb-3 "
+                                                    aria-label="Large input example" readonly>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <button type="submit" id="submitButton" class=" btn btn-secondary w-100 my-4"
+                                disabled>Calculate</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p class="mt-3">&copy; 2025 National Cart Services. All rights reserved.</p>
+    </footer>
+
+    <!-- ----------------------------Script-Links------------------------------ -->
+
+    <!-- Custom Main JS -->
+    <script type="module" src="./js/costCalculator.js" defer></script>
+    <script type="module" src="./js/main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</body>
+
+</html>
