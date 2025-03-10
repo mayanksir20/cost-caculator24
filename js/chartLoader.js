@@ -2,45 +2,94 @@ document.addEventListener('DOMContentLoaded', function () {
   const resultContainer = document.getElementById('resultContainer');
   const companyName = document.getElementById('cityOrCounty');
   const stateName = document.getElementById('stateName');
+  const summary1Element = document.getElementById('Summary1');
+  const summary2Element = document.getElementById('Summary2');
+  const cityorcountyinput = document.getElementById('formCityCounty');
+  const stateformInput = document.getElementById('state');
+
+  //form
 
   try {
     // ✅ Load data from localStorage
-    const storedData = JSON.parse(localStorage.getItem('resultData'));
+
+    const storedData = JSON.parse(localStorage.getItem('formData'));
 
     if (!storedData || !storedData.data) {
-      throw new Error('Invalid data received');
+      throw new Error('Invalid data received from localStorage');
     }
 
-    console.log('Received full data:', storedData);
-    console.log('Received formData.f11:', storedData.f11);
+    console.log('✅ Loaded formData:', storedData);
+    console.log('✅ State Name (f11):', storedData.f11);
 
-    // ✅ Display first company name
-    const companyNameValue = storedData.data.data.NoOfEmployees[0]['company-1'];
-    companyName.innerHTML = `<p>${companyNameValue}</p>`;
-    stateName.innerHTML = `<p>${storedData.f11}</p>`;
+    // ✅ Display first company name (with null checks)
+    const noOfEmployees = storedData.data.data?.NoOfEmployees;
 
-    // ✅ Pass data to charts
-    loadEmployeeChartData(storedData.data.data.NoOfEmployees);
-    loadVehicleChartData(storedData.data.data.noOfVehicles);
-    loadEmployeeCostsChartData(storedData.data.data.empCost);
-    loadVehicleCostsChartData(storedData.data.data.vehicleCost);
-    loadSavingsChartData(storedData.data.data.savingPerWeek);
-    loadSavingsYearChartData(storedData.data.data.savingPerYear);
-    loadActionPieChartData(storedData.data.data.Action);
+    if (companyName && noOfEmployees && noOfEmployees.length > 0) {
+      const companyNameValue = noOfEmployees[0]['company-1'] || 'N/A';
+      companyName.innerHTML = `<p>${companyNameValue}</p>`;
+      cityorcountyinput.value = companyNameValue;
+      stateformInput.value = storedData.f11;
+    } else {
+      console.error("⚠️ 'cityOrCounty' element not found or 'NoOfEmployees' data is missing.");
+      if (companyName) {
+        companyName.innerHTML = '<p>N/A</p>';
+      }
+    }
 
-    // ✅ Clear localStorage data to avoid stale data on refresh (optional)
-    
+    // ✅ Display State Name
+    if (stateName) {
+      const stateValue = storedData.f11 || 'N/A';
+      stateName.innerHTML = `<p>${stateValue}</p>`;
+    } else {
+      console.error("⚠️ Element with id 'stateName' not found.");
+    }
+
+    //✅ Bind Summary Data
+    const summaryData = storedData.data.data?.Summary;
+    // console.log(storedData.data + "<br/>"+ summaryData + "check me out");
+    if (summary1Element && summaryData && summaryData.length > 0) {
+      if (summary1Element) {
+        summary1Element.innerHTML = `${summaryData[0]['Summary1'] || 'N/A'}`;
+        console.log(summaryData);
+      } else {
+        console.log(summaryData);
+        console.error("⚠️ Element with id 'Summary1' not found.");
+      }
+    }
+    if (summary2Element && summaryData && summaryData.length > 0) {
+      if (summary2Element) {
+        summary2Element.innerHTML = `${summaryData[0]['Summary2'] || 'N/A'}`;
+      } else {
+        console.error("⚠️ Element with id 'Summary2' not found.");
+      }
+    }
+
+    // ✅ Pass data to charts with checks
+    if (noOfEmployees) loadEmployeeChartData(noOfEmployees);
+    if (storedData.data.data?.noOfVehicles) loadVehicleChartData(storedData.data.data.noOfVehicles);
+    if (storedData.data.data?.empCost) loadEmployeeCostsChartData(storedData.data.data.empCost);
+    if (storedData.data.data?.vehicleCost)
+      loadVehicleCostsChartData(storedData.data.data.vehicleCost);
+    if (storedData.data.data?.savingPerWeek)
+      loadSavingsChartData(storedData.data.data.savingPerWeek);
+    if (storedData.data.data?.savingPerYear)
+      loadSavingsYearChartData(storedData.data.data.savingPerYear);
+    if (storedData.data.data?.Action) loadActionPieChartData(storedData.data.data.Action);
+
+    // ✅ Optional: Clear localStorage after processing
+    // localStorage.removeItem('formData'); // Uncomment to clear data after use
   } catch (error) {
-    console.error('Error receiving data:', error);
+    console.error('❌ Error processing data:', error);
     if (resultContainer) {
-      resultContainer.innerHTML = '<p>Error receiving data.</p>';
+      resultContainer.innerHTML = '<p>Error receiving or processing data.</p>';
     }
   }
 });
 
-// ---------- Updated loadEmployeeChartData to Accept Data ----------
+///////////////////////////////////////////////////////////////
+// ---------- Load Employee Chart ----------
 function loadEmployeeChartData(employeeData) {
-  console.log('Retrieved Data:', employeeData);
+  console.log('Retrieved Employee Data:', employeeData);
 
   try {
     if (!employeeData || !Array.isArray(employeeData)) {
@@ -54,17 +103,20 @@ function loadEmployeeChartData(employeeData) {
 
     const fieldTechsData = employeeData.map((entry) => {
       const fieldTechKey = Object.keys(entry).find((key) => key.startsWith('fieldTechs'));
-      return parseFloat((entry[fieldTechKey] || 0).toFixed(2));
+      return parseFloat(entry[fieldTechKey]) || 0; // ✅ Ensure 0 values are included
     });
 
     const supervisorsData = employeeData.map((entry) => {
       const supervisorsKey = Object.keys(entry).find((key) => key.startsWith('supervisors'));
-      return parseFloat((entry[supervisorsKey] || 0).toFixed(2));
+      return parseFloat(entry[supervisorsKey]) || 0; // ✅ Ensure 0 values are included
     });
+
+    // ✅ Fix: Correct max value calculation
+    const maxValue = Math.max(...fieldTechsData, ...supervisorsData);
 
     const ctx = document.getElementById('NoOfEmployee').getContext('2d');
 
-    new Chart(ctx, {
+    const chartConfig = {
       type: 'bar',
       data: {
         labels: labels,
@@ -73,11 +125,14 @@ function loadEmployeeChartData(employeeData) {
             label: '# of Field Techs',
             data: fieldTechsData,
             backgroundColor: '#2c3e50',
+            minBarLength: 60,
           },
           {
             label: '# of Supervisors',
             data: supervisorsData,
-            backgroundColor: '#5DADE2',
+            backgroundColor: '#69ABC3',
+            minBarLength: 30,
+          
           },
         ],
       },
@@ -86,68 +141,57 @@ function loadEmployeeChartData(employeeData) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-          },
+          legend: { display: true, position: 'bottom' },
           tooltip: {
             enabled: true,
             callbacks: {
-              title: (tooltipItems) => {
-                const datasetIndex = tooltipItems[0].datasetIndex;
-                return `Series: ${tooltipItems[0].chart.data.datasets[datasetIndex].label}`;
-              },
-              label: (tooltipItem) => {
-                return `Point: "${tooltipItem.label}"`; // Company Name
-              },
-              afterLabel: (tooltipItem) => {
-                return `Value: ${tooltipItem.raw.toFixed(2)}`;
-              },
+              title: (tooltipItems) => `Series: ${tooltipItems[0].dataset.label}`,
+              label: (tooltipItem) => `Point: "${tooltipItem.label}"`,
+              afterLabel: (tooltipItem) => `Value: ${tooltipItem.raw}`,
             },
           },
           datalabels: {
             display: true,
-            anchor: 'center',
-            align: 'center',
             color: 'white',
-            font: {
-              weight: 'bold',
-              size: 10,
-            },
-            formatter: (value) => value.toFixed(2),
+            font: { size: 15, family: 'aptos narrow' },
+            formatter: (value) => `${value.toFixed(0)}`, // ✅ Ensure 0 values are displayed as "0"
           },
         },
         scales: {
           x: {
             stacked: true,
             beginAtZero: true,
-            ticks: {
-              callback: function (value) {
-                return value.toFixed(2);
-              },
-            },
+            max: maxValue * 1.5, // ✅ Correct max scaling
+            ticks: { display: false },
+            grid: { display: false, drawBorder: false },
           },
           y: {
             stacked: true,
+            ticks: { display: true },
+            grid: { display: false, drawBorder: false },
           },
         },
       },
       plugins: [ChartDataLabels],
-    });
+    };
+
+    createChart(ctx, chartConfig, 'NoOfEmployee'); // Ensure `createChart` is defined
   } catch (error) {
     console.error('Error generating Employee Chart:', error);
   }
 }
 
-// -------bar-chart--vehicles----js---
 
+///////////////////////////////////////////////////////////////
+// ---------- Load Vehicle Chart ----------
 async function loadVehicleChartData(noOfVehicles) {
+  console.log('Retrieved Vehicle Data:', noOfVehicles);
+
   try {
     if (!noOfVehicles || !Array.isArray(noOfVehicles)) {
       throw new Error('Invalid Vehicle Data');
     }
 
-    // Extract labels and vehicle counts dynamically
     const labels = noOfVehicles.map((entry) => {
       const companyNameKey = Object.keys(entry).find((key) => key.startsWith('vcost'));
       return entry[companyNameKey] || 'Unknown Company';
@@ -158,10 +202,9 @@ async function loadVehicleChartData(noOfVehicles) {
       return entry[fieldTechKey] || 0;
     });
 
-    // Chart.js setup
-    const ctx2 = document.getElementById('NoOfVehicles').getContext('2d');
+    const ctx = document.getElementById('NoOfVehicles').getContext('2d');
 
-    new Chart(ctx2, {
+    const chartConfig = {
       type: 'bar',
       data: {
         labels: labels,
@@ -170,6 +213,7 @@ async function loadVehicleChartData(noOfVehicles) {
             label: '# of Vehicles',
             data: vehiclesData,
             backgroundColor: '#2c3e50',
+            minBarLength: 60,
           },
         ],
       },
@@ -178,309 +222,329 @@ async function loadVehicleChartData(noOfVehicles) {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-          },
+          legend: { display: true, position: 'bottom' },
           tooltip: {
             enabled: true,
             callbacks: {
-              title: () => {
-                return 'Series: # of Vehicles'; // Show series first
-              },
-              label: (tooltipItem) => {
-                return `Point: "${tooltipItem.label}"`; // City or county in quotes
-              },
-              afterLabel: (tooltipItem) => {
-                return `Value: ${tooltipItem.raw}`; // Show vehicle count
-              },
+              title: () => 'Series: # of Vehicles',
+              label: (tooltipItem) => `Point: "${tooltipItem.label}"`,
+              afterLabel: (tooltipItem) => `Value: ${tooltipItem.raw}`,
             },
+            titleFont: { family: 'aptos narrow', size: 13, weight: 'bold' },
+            bodyFont: { family: 'aptos narrow', size: 12, weight: 'normal' },
+            footerFont: { family: 'aptos narrow', size: 10, weight: 'italic' },
           },
           datalabels: {
             display: true,
             anchor: 'center',
             align: 'center',
             color: 'white',
-            font: {
-              weight: 'bold',
-              size: 10,
-            },
+            font: { weight: '', size: 13, family: 'aptos narrow' },
             formatter: (value) => value,
           },
         },
         scales: {
           x: {
             beginAtZero: true,
+            ticks: { display: false },
+            grid: { display: false, drawBorder: true },
           },
+          y: { ticks: { display: true }, grid: { display: false, drawBorder: false } },
         },
       },
       plugins: [ChartDataLabels],
-    });
+    };
+
+    createChart(ctx, chartConfig, 'NoOfVehicles');
   } catch (error) {
     console.error('Error generating Vehicle Chart:', error);
   }
 }
 
-// --------------bar-chart-of-employee-costs---js---
+///////////////////////////////////////////////////////////////
+// ---------- Load Employee Costs Chart ----------
 
 async function loadEmployeeCostsChartData(empCost) {
   try {
-    // Validate incoming data
     if (!empCost || !Array.isArray(empCost)) {
       throw new Error('Invalid Employee Cost Data');
     }
 
-    // Extract labels dynamically
+    // Extract company names
     const labels = empCost.map((entry) => {
       const companyKey = Object.keys(entry).find((key) => key.startsWith('empC'));
       return entry[companyKey] || 'Unknown Company';
     });
 
-    // Extract and format Wages
-    const wagesData = empCost.map((entry) => {
+    // Extract wages and benefits data
+    let wagesData = empCost.map((entry) => {
       const wagesKey = Object.keys(entry).find((key) => key.startsWith('PersonnelCostWages'));
-      return parseFloat(entry[wagesKey] || 0).toFixed(2);
+      return parseFloat(entry[wagesKey]) || 0;
     });
 
-    // Extract and format Benefits
-    const benefitsData = empCost.map((entry) => {
+    let benefitsData = empCost.map((entry) => {
       const benefitsKey = Object.keys(entry).find((key) => key.startsWith('PersonnelCostBenefits'));
-      return parseFloat(entry[benefitsKey] || 0).toFixed(2);
+      return parseFloat(entry[benefitsKey]) || 0;
     });
 
-    // Chart.js setup
-    const ctx3 = document.getElementById('EmployeeCost').getContext('2d');
+    // Find the maximum value for proper bar scaling
+    const maxValue = Math.max(...wagesData, ...benefitsData);
 
-    new Chart(ctx3, {
+    // Increase chart width dynamically for better visibility
+    document.getElementById('EmployeeCost').style.width = '300px';
+
+    const ctx = document.getElementById('EmployeeCost').getContext('2d');
+
+    const chartConfig = {
       type: 'bar',
       data: {
-        labels: labels,
+        labels: labels, // Company names
         datasets: [
           {
             label: 'Wages',
             data: wagesData,
-            backgroundColor: '#2c1e1e',
+            backgroundColor: '#2c3e50',
+            minBarLength: 60,
           },
           {
             label: 'Benefits',
             data: benefitsData,
-            backgroundColor: '#5DADE2',
+            backgroundColor: '#69ABC3',
+            minBarLength: 50,
           },
         ],
       },
       options: {
-        indexAxis: 'y', // Horizontal bar chart
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: { left: 20, right: 20, top: 10, bottom: 10 },
+        },
         plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-          },
+          legend: { display: true, position: 'bottom' },
           tooltip: {
             enabled: true,
             callbacks: {
-              title: (tooltipItems) => {
-                const datasetIndex = tooltipItems[0].datasetIndex;
-                return `Series: ${tooltipItems[0].chart.data.datasets[datasetIndex].label}`;
-              },
-              label: (tooltipItem) => {
-                return `Point: "${tooltipItem.label}"`; // Company Name inside quotes
-              },
-              afterLabel: (tooltipItem) => {
-                return `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`;
-              },
+              title: (tooltipItems) => `Series: ${tooltipItems[0].dataset.label}`,
+              label: (tooltipItem) => `Company: "${tooltipItem.label}"`,
+              afterLabel: (tooltipItem) =>
+                `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}`,
             },
           },
           datalabels: {
-            display: true, // Display data labels
-            anchor: 'center',
-            align: 'center',
+            display: true,
             color: 'white',
             font: {
-              weight: 'bold',
-              size: 10,
+              size: 13,
+              family: 'aptos narrow',
             },
             formatter: (value) =>
               `$${Number(value).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`, // Format as currency
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}`, // ✅ 0 values will now be displayed as "$0"
+
+            anchor: 'center', // Align text inside bars
+            align: 'center', // Keep text centered inside bars
+            backgroundColor: 'transparent', // No background color for text
+            padding: 5,
+            borderRadius: 5,
           },
         },
         scales: {
           x: {
             stacked: true,
             beginAtZero: true,
+            max: maxValue * 2,
+            ticks: { display: false }, // Removes numbers along x-axis
+            grid: { display: false }, // Removes grid lines
+            barPercentage: 0.7, // Ensures bars are thick enough for labels
           },
           y: {
             stacked: true,
+            ticks: { display: true, font: { size: 12 } },
+            grid: { display: false },
           },
         },
       },
-      plugins: [ChartDataLabels], // Enable Data Labels Plugin
-    });
+      plugins: [ChartDataLabels],
+    };
+
+    createChart(ctx, chartConfig, 'EmployeeCost');
   } catch (error) {
     console.error('Error generating Employee Costs Chart:', error);
   }
 }
 
-// ---------bar-chart--vechicle--costs--js-------
+///////////////////////////////////////////////////////////////
+// ---------- Load Vehicle Costs Chart ----------
 
 async function loadVehicleCostsChartData(vehicleCost) {
   try {
-    // Validate incoming data
     if (!vehicleCost || !Array.isArray(vehicleCost)) {
       throw new Error('Invalid Vehicle Cost Data');
     }
 
-    // Extract Labels and Data Dynamically
     const labels = vehicleCost.map((entry) => {
-      const companyKey = Object.keys(entry).find((key) => key === 'county' || key === 'cart');
+      const companyKey = Object.keys(entry).find(
+        (key) => key.toLowerCase().includes('vehicle') || key.toLowerCase().includes('cart')
+      );
       return entry[companyKey] || 'Unknown Company';
     });
 
-    // Extract and format Truck Cost
     const truckCostData = vehicleCost.map((entry) => {
       const truckCostKey = Object.keys(entry).find((key) => key.includes('truckCost'));
-      return parseFloat(entry[truckCostKey] || 0).toFixed(2);
+      return parseFloat(entry[truckCostKey]) || 0;
     });
 
-    // Extract and format Fuel Cost
     const fuelData = vehicleCost.map((entry) => {
       const fuelKey = Object.keys(entry).find((key) => key.includes('fuel'));
-      return parseFloat(entry[fuelKey] || 0).toFixed(2);
+      return parseFloat(entry[fuelKey]) || 0;
     });
 
-    // Extract and format Maintenance & Insurance Cost
     const maintenanceData = vehicleCost.map((entry) => {
       const maintKey = Object.keys(entry).find((key) => key.includes('maintInsurance'));
-      return parseFloat(entry[maintKey] || 0).toFixed(2);
+      return parseFloat(entry[maintKey]) || 0;
     });
 
-    // Chart.js setup
-    const ctx4 = document.getElementById('VehicleCost').getContext('2d');
+    // ✅ Find the maximum value for scaling
+    const maxValue = Math.max(...truckCostData, ...fuelData, ...maintenanceData);
 
-    new Chart(ctx4, {
+    const ctx = document.getElementById('VehicleCost').getContext('2d');
+
+    const chartConfig = {
       type: 'bar',
       data: {
         labels: labels,
         datasets: [
-          {
-            label: 'Truck Cost',
-            data: truckCostData,
-            backgroundColor: '#2c3e50',
-          },
-          {
-            label: 'Fuel',
-            data: fuelData,
-            backgroundColor: '#5DADE2',
-          },
-          {
-            label: 'Maint, Insurance, Etc...',
-            data: maintenanceData,
-            backgroundColor: '#8B7D6B',
-          },
+          { label: 'Truck Cost', data: truckCostData, backgroundColor: '#2c3e50', minBarLength: 100 },
+          { label: 'Fuel', data: fuelData, backgroundColor: '#69ABC3', minBarLength: 60 },
+          { label: 'Maint, Insurance, Etc...', data: maintenanceData, backgroundColor: '#8B7D6B', minBarLength: 50 },
         ],
       },
       options: {
-        indexAxis: 'y', // Horizontal bar chart
+        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-          },
+          legend: { display: true, position: 'bottom' },
           tooltip: {
             enabled: true,
             callbacks: {
-              title: (tooltipItems) => {
-                const datasetIndex = tooltipItems[0].datasetIndex;
-                return `Series: ${tooltipItems[0].chart.data.datasets[datasetIndex].label}`;
-              },
-              label: (tooltipItem) => {
-                return `Point: "${tooltipItem.label}"`; // Company Name inside quotes
-              },
-              afterLabel: (tooltipItem) => {
-                return `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`;
-              },
+              title: (tooltipItems) => `Series: ${tooltipItems[0].dataset.label}`,
+              label: (tooltipItem) => `Point: "${tooltipItem.label}"`,
+              afterLabel: (tooltipItem) =>
+                `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}`,
             },
           },
           datalabels: {
             display: true,
-            anchor: function (context) {
-              return context.dataset.data[context.dataIndex] < 100 ? 'end' : 'center'; // Move small values outside
-            },
-            align: function (context) {
-              return context.dataset.data[context.dataIndex] < 100 ? 'end' : 'center'; // Align small values outside
-            },
-            color: function (context) {
-              return context.dataset.data[context.dataIndex] < 100 ? '#000' : '#fff'; // Dark text for small values
-            },
+            anchor: 'center', // Ensures labels stay inside the bars
+            align: 'center',  // Centers labels inside the bars
+            color: 'white',   // Keeps the text color white for better visibility
             font: {
-              weight: 'bold',
-              size: 10,
+              size: 13,
+              family: 'Aptos Narrow',
             },
             formatter: (value) =>
               `$${Number(value).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}`, // Format as currency
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}`,
           },
         },
         scales: {
           x: {
             stacked: true,
             beginAtZero: true,
+            max: maxValue * 1.6, // ✅ Ensures proper scaling
+            ticks: { display: false },
+            grid: { display: false, drawBorder: true },
           },
           y: {
             stacked: true,
+            ticks: { display: true },
+            grid: { display: false, drawBorder: false },
           },
         },
       },
-      plugins: [ChartDataLabels], // Enable Data Labels Plugin
-    });
+      plugins: [ChartDataLabels],
+    };
+
+    createChart(ctx, chartConfig, 'VehicleCost');
   } catch (error) {
     console.error('Error generating Vehicle Costs Chart:', error);
   }
 }
 
-// ---------bar-chart--Saving--js-------
+
+///////////////////////////////////////////////////////////////
+// ---------- Load Savings Per Week Chart ----------
 
 async function loadSavingsChartData(savingPerWeek) {
   try {
-    // Validate incoming data
     if (!savingPerWeek || !Array.isArray(savingPerWeek)) {
       throw new Error('Invalid Saving Per Week Data');
     }
 
-    // Extract Labels and Data
     const labels = [];
+    const fullLabels = [];
     const savingsData = [];
+    const backgroundColors = [];
 
-    // Keys to be plotted
-    const keysToPlot = ['countyCoS', 'Employee', 'Vehicle', 'Other', 'NCSCoS'];
+    const keysToPlot = ['county CoS', 'Employees', 'Vehicles', 'Other', 'NCS CoS'];
 
     savingPerWeek.forEach((entry) => {
       keysToPlot.forEach((key) => {
-        if (entry[key] !== undefined) {
-          labels.push(key);
-          savingsData.push(parseFloat(entry[key] || 0).toFixed(2));
+        const mappedKey =
+          key === 'Employees'
+            ? 'Employee'
+            : key === 'county CoS'
+            ? 'countyCoS'
+            : key === 'NCS CoS'
+            ? 'NCSCoS'
+            : key === 'Vehicles'
+            ? 'Vehicle'
+            : key;
+
+        if (entry[mappedKey] !== undefined) {
+          let cityOrCounty = entry.city || entry.county || 'Unknown';
+
+          // ✅ Sirf `county CoS` ka format change hoga
+          let fullLabel = key === 'county CoS' ? `${cityOrCounty} CoS` : key;
+
+          // ✅ Sirf `county CoS` label par ellipsis lagega agar > 20 characters
+          let displayLabel =
+            key === 'county CoS' && fullLabel.length > 20
+              ? fullLabel.substring(0, 17) + '...'
+              : fullLabel;
+
+          labels.push(displayLabel);
+          fullLabels.push(fullLabel);
+          savingsData.push(parseFloat(entry[mappedKey] || 0));
+
+          let barColor =
+            key === 'NCS CoS'
+              ? '#2c3e50'
+              : key === 'county CoS'
+              ? '#2d3420'
+              : '#69ABC3';
+
+          backgroundColors.push(barColor);
         }
       });
     });
 
-    // Chart.js setup
-    const ctx5 = document.getElementById('monthSaving').getContext('2d');
+    const ctx = document.getElementById('monthSaving').getContext('2d');
 
-    new Chart(ctx5, {
+    const chart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: labels,
@@ -488,179 +552,194 @@ async function loadSavingsChartData(savingPerWeek) {
           {
             label: 'Savings',
             data: savingsData,
-            backgroundColor: savingsData.map(
-              (value) =>
-                value < 0
-                  ? 'rgba(93, 173, 226, 0.5)' // Light blue for negative values
-                  : value > 15000
-                  ? '#1C1C1C' // Darker for high values
-                  : '#5DADE2', // Default blue
-            ),
+            backgroundColor: backgroundColors,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        layout: {
-          padding: {
-            top: 30, // Extra space for large values
-          },
-        },
+        layout: { padding: { top: 30 } },
         plugins: {
-          legend: {
-            display: false, // No legend needed
-          },
+          legend: { display: false },
           tooltip: {
             enabled: true,
+            mode: 'nearest',
+            intersect: false,
+            position: 'nearest',
             callbacks: {
-              title: () => {
-                return 'Series: "Savings"'; // Show series first
-              },
-              label: (tooltipItem) => {
-                return `Point: "${tooltipItem.label}"`; // Key inside quotes
-              },
-              afterLabel: (tooltipItem) => {
-                return `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`;
-              },
+              title: () => `Series: "Savings"`,
+              label: (tooltipItem) => `Point: "${fullLabels[tooltipItem.dataIndex]}"`, 
+              afterLabel: (tooltipItem) =>
+                `Value: $${Number(tooltipItem.raw).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}`,
             },
           },
           datalabels: {
-            color: function (context) {
-              return context.dataset.data[context.dataIndex] > 15000 ? '#fff' : '#000'; // White text for dark bars
-            },
-            font: {
-              weight: 'bold',
-              size: 10,
-            },
-            formatter: function (value) {
-              return value < 0
+            color: '#000',
+            font: { size: 13, family: 'Aptos Narrow' },
+            formatter: (value) =>
+              value < 0
                 ? `$(${Math.abs(value).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
                   })})`
                 : `$${Number(value).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}`;
-            },
-            anchor: function (context) {
-              return context.dataset.data[context.dataIndex] > 15000 ? 'end' : 'center'; // Adjust anchor for big values
-            },
-            align: function (context) {
-              return context.dataset.data[context.dataIndex] > 15000 ? 'start' : 'top'; // Push large values slightly down
-            },
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}`,
+            anchor: 'end',
+            align: 'top',
+            offset: 5,
           },
         },
         scales: {
           x: {
-            grid: {
-              display: false,
+            ticks: {
+              font: { size: 12, color: '#717171' },
+              display: true,
+              callback: (value, index) => (index % 2 === 0 ? ['', labels[index]] : [labels[index]]),
             },
+            grid: { display: false, drawBorder: false },
           },
           y: {
             beginAtZero: true,
             ticks: {
-              callback: function (value) {
-                return `$${Number(value).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}`;
-              },
+              display: false,
+              callback: (value) =>
+                `$${Number(value).toLocaleString(undefined, {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0,
+                })}`,
             },
+            grid: { display: false, drawBorder: false },
           },
         },
+        hover: { mode: 'nearest', intersect: false },
       },
-      plugins: [ChartDataLabels], // Enable Data Labels Plugin
+      plugins: [ChartDataLabels],
+    });
+
+    // **🎯 Custom Tooltip Show on Label Hover**
+    document.getElementById('monthSaving').addEventListener('mousemove', (event) => {
+      const canvas = event.target;
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      
+      const xScale = chart.scales.x;
+      if (!xScale) return;
+
+      let nearestIndex = null;
+      let minDistance = Number.MAX_VALUE;
+
+      xScale.ticks.forEach((tick, index) => {
+        const labelX = xScale.getPixelForTick(index);
+        const distance = Math.abs(x - labelX);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestIndex = index;
+        }
+      });
+
+      if (nearestIndex !== null && minDistance < 20) {
+        chart.tooltip.setActiveElements([{ datasetIndex: 0, index: nearestIndex }], {
+          x: xScale.getPixelForTick(nearestIndex),
+          y: y,
+        });
+        chart.update();
+      } else {
+        chart.tooltip.setActiveElements([], {});
+        chart.update();
+      }
     });
   } catch (error) {
     console.error('Error loading Savings JSON data:', error);
   }
 }
 
+
+///////////////////////////////////////////////////////////////
 // -------bar-chart--Saving-per-year--js----
+
 async function loadSavingsYearChartData(savingPerYear) {
   try {
-    // Validate incoming data
     if (!savingPerYear || !Array.isArray(savingPerYear) || savingPerYear.length === 0) {
       throw new Error('Invalid Saving Per Year Data');
     }
 
     // Extract Total Savings
     const totalSavingsEntry = savingPerYear[0]; // Assuming only one entry
-    const savingsAmount = totalSavingsEntry[Object.keys(totalSavingsEntry)[0]]; // Extract value
+    const savingsAmount = parseInt(totalSavingsEntry[Object.keys(totalSavingsEntry)[0]]); // Extract value
 
-    // Chart.js setup
-    const ctx6 = document.getElementById('YearlySaving').getContext('2d');
+    const ctx = document.getElementById('YearlySaving').getContext('2d');
 
-    new Chart(ctx6, {
+    const chartConfig = {
       type: 'bar',
       data: {
-        labels: ['Total $'], // Fixed label
+        labels: ['Total $'], // Fixed label at the bottom
         datasets: [
           {
-            label: 'Total', // Fixed series name
+            label: 'Total Savings',
             data: [savingsAmount],
-            backgroundColor: '#1C1C1C', // Dark bar color
+            backgroundColor: '#2c3e50', // Dark bar color
+            barThickness: 70, // ✅ Keeps bar size fixed
+            maxBarThickness: 100, // ✅ Ensures bar does not stretch
           },
         ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: false, // ✅ Ensures fixed height
         layout: {
-          padding: {
-            top: 10,
-            bottom: 20,
-          },
+          padding: { top: 10, bottom: 20 },
         },
         plugins: {
-          legend: {
-            display: false, // Hide legend
-          },
+          legend: { display: false }, // ✅ Hide legend
           tooltip: {
             enabled: true,
             callbacks: {
-              title: () => 'Series 1 Point "Total', // Tooltip title as "Total"
-              label: (tooltipItem) => `$${Number(tooltipItem.raw).toLocaleString()}`, // Show only "$<amount>"
+              title: () => 'Savings Per Year',
+              label: (tooltipItem) => `$${Number(tooltipItem.raw).toLocaleString()}`,
             },
           },
           datalabels: {
-            color: 'rgba(255, 255, 255, 0.9)', // Light gray text inside the bar
-            font: {
-              weight: 'bold',
-              size: 12,
-            },
-            formatter: (value) => `$${value.toLocaleString()}`, // Always starts with "$"
-            anchor: 'center',
-            align: 'center',
+            color: 'black', // ✅ Keeps text black
+            font: { size: 13, family: 'Aptos Narrow'},
+            formatter: (value) => `$${value.toLocaleString()}`,
+            anchor: 'end', // ✅ Ensures label stays exactly at the top of the bar
+            align: 'top', // ✅ Keeps label at the end of the bar
+            offset: -3, // ✅ Ensures text does not float away from the bar
+            clip: false, // ✅ Prevents text from being cut off
           },
         },
         scales: {
           x: {
-            grid: {
-              display: false,
+            grid: { drawBorder: false }, // ✅ Removes unnecessary borders
+            ticks: {
+              display: true,
+              font: { size: 13, family: 'system-ui', color: '#717171', weight: '' },
             },
           },
           y: {
-            beginAtZero: true,
-            suggestedMax: savingsAmount * 1.3, // Adjust height range dynamically
-            ticks: {
-              callback: (value) => `$${value.toLocaleString()}`, // Format Y-axis labels as currency
-            },
+            display: false, // ✅ Hides numbers along the Y-axis
+            beginAtZero: true, // ✅ Prevents bars from shrinking
+            max: Math.max(savingsAmount * 1.1, 50000), // ✅ Ensures height is limited dynamically
           },
         },
       },
-      plugins: [ChartDataLabels], // Enable data labels
-    });
+      plugins: [ChartDataLabels],
+    };
+
+    new Chart(ctx, chartConfig); // Directly create the chart
   } catch (error) {
     console.error('Error loading Savings Year JSON data:', error);
   }
 }
-
+///////////////////////////////////////////////////////////////
 // ----------pai-chart--$Action-----
 
 async function loadActionPieChartData(Action) {
@@ -671,13 +750,14 @@ async function loadActionPieChartData(Action) {
     }
 
     // Original colors (Now: "National Cart" = Light, "County" = Dark)
-    const lightColors = ['#5DADE2']; // Light colors for "National Cart"
+    const lightColors = ['#69ABC3']; // Light colors for "National Cart"
     const darkColors = ['#2c3e50']; // Dark colors for "County"
 
     // Extract Labels and Data Values Dynamically
     const labels = [];
     const dataValues = [];
     const backgroundColors = [];
+    const sliceOffsets = []; // ✅ To store slice offset values
 
     Action.forEach((entry) => {
       // Find label and value keys dynamically
@@ -691,11 +771,14 @@ async function loadActionPieChartData(Action) {
       dataValues.push(value);
 
       // Apply light/dark colors
-      if (label.includes('National Cart')) {
+      if (label.includes('NCS')) {
         backgroundColors.push(lightColors[backgroundColors.length % lightColors.length]);
       } else {
         backgroundColors.push(darkColors[backgroundColors.length % darkColors.length]);
       }
+
+      // ✅ Slightly push each slice outward (5px)
+      sliceOffsets.push(7);
     });
 
     // Chart.js setup
@@ -709,6 +792,12 @@ async function loadActionPieChartData(Action) {
           {
             data: dataValues,
             backgroundColor: backgroundColors,
+            borderWidth: 3, // ✅ Increase gap between slices
+            borderColor: '#ffffff', // ✅ White border for spacing effect
+            hoverBorderWidth: 5, // ✅ Slightly larger border on hover
+            offset: sliceOffsets, // ✅ Push slices outward by 5px
+            minBarLength: 90,
+            
           },
         ],
       },
@@ -721,19 +810,15 @@ async function loadActionPieChartData(Action) {
             display: false, // Disable default legend
           },
           tooltip: {
-            enabled: true,
+            enabled: true, // ✅ Tooltip is enabled
             callbacks: {
-              title: () => 'Series: "$/Action"',
-              label: (tooltipItem) => `Point: "${tooltipItem.label}"`,
-              afterLabel: (tooltipItem) => `Value: ${Number(tooltipItem.raw).toFixed(2)}%`,
+              title: (tooltipItems) => tooltipItems[0].label, // ✅ Only show label in tooltip
+              label: () => '', // ✅ No extra data (empty string removes value display)
             },
           },
           datalabels: {
             color: '#FFFFFF',
-            font: {
-              weight: 'bold',
-              size: 10,
-            },
+            font: { weight: '', size: 13, family: 'aptos narrow',},
             formatter: (value) => `$${Number(value).toFixed(2)}`,
           },
         },
@@ -768,16 +853,17 @@ async function loadActionPieChartData(Action) {
 
       const colorBox = document.createElement('span');
 
-      colorBox.style.width = '12px';
+      colorBox.style.width = '35px';
       colorBox.style.height = '12px';
-      colorBox.style.backgroundColor = backgroundColors[index]; // Ensure correct color is applied
-      colorBox.style.display = 'inline-block';
+      colorBox.style.backgroundColor = backgroundColors[index];
       colorBox.style.marginRight = '5px';
-      colorBox.style.borderRadius = '2px';
-      colorBox.style.border = '1px solid #000'; // Optional border for better visibility
 
       const textLabel = document.createElement('span');
       textLabel.textContent = label;
+      textLabel.style.fontSize = '13px'; // ✅ Font size set to 10px
+      textLabel.style.color = '#717171'; // ✅ Font color set to gray
+      textLabel.style.fontFamily = 'system-ui';
+      textLabel.style.fontWeight = '400'; // ✅ Font weight set to bold
 
       legendItem.appendChild(colorBox);
       legendItem.appendChild(textLabel);
@@ -789,4 +875,89 @@ async function loadActionPieChartData(Action) {
   } catch (error) {
     console.error('Error loading Action Pie Chart JSON data:', error);
   }
+}
+
+///////////////////////////////////////////////////////////////
+
+let charts = []; // Array to store all chart instances
+
+// ---------- Reusable Function to Create Charts ----------
+function createChart(ctx, chartConfig, chartId) {
+  // Destroy existing chart if it exists
+  let existingChartIndex = charts.findIndex((chartObj) => chartObj.id === chartId);
+  if (existingChartIndex !== -1) {
+    charts[existingChartIndex].chart.destroy();
+    charts.splice(existingChartIndex, 1);
+  }
+
+  // Create and store the new chart
+  const chart = new Chart(ctx, chartConfig);
+  charts.push({ id: chartId, chart });
+  return chart;
+}
+// ---------- Function to Hide Gridlines and Ticks ----------
+function hideGridlinesAndTicks(chart) {
+  Object.keys(chart.options.scales).forEach((axis) => {
+    chart.options.scales[axis].ticks.display = false;
+    chart.options.scales[axis].grid.display = false;
+    chart.options.scales[axis].grid.drawBorder = false;
+  });
+  chart.update();
+}
+
+// ---------- Function to Restore Gridlines and Ticks ----------
+function restoreGridlinesAndTicks(chart) {
+  Object.keys(chart.options.scales).forEach((axis) => {
+    chart.options.scales[axis].ticks.display = false;
+    chart.options.scales[axis].grid.display = false;
+    chart.options.scales[axis].grid.drawBorder = false;
+  });
+  chart.update();
+}
+
+// ---------- Print Button Logic ----------
+document.querySelector('.print-button').addEventListener('click', () => {
+  if (charts.length === 0) return;
+
+  // Hide gridlines and ticks for all charts
+  charts.forEach(({ chart }) => hideGridlinesAndTicks(chart));
+
+  // Delay to allow updates before print dialog opens
+  setTimeout(() => {
+    window.print();
+
+    // Restore gridlines and ticks after printing
+    charts.forEach(({ chart }) => restoreGridlinesAndTicks(chart));
+  }, 500);
+});
+
+// -------nav-toggler-----------------
+
+const navToggler = document.querySelector('.nav-toggler');
+const navMenu = document.querySelector('.site-navbar ul');
+const navLinks = document.querySelectorAll('.site-navbar a');
+
+allEventListners();
+
+function allEventListners() {
+  navToggler.addEventListener('click', togglerClick);
+  navLinks.forEach((elem) => elem.addEventListener('click', navLinkClick));
+}
+
+function togglerClick() {
+  navToggler.classList.toggle('toggler-open');
+  navMenu.classList.toggle('open');
+
+  if (navMenu.classList.contains('open')) {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = 'auto';
+  }
+}
+
+// ✅ Fix: Define navLinkClick function
+function navLinkClick() {
+  navToggler.classList.remove('toggler-open');
+  navMenu.classList.remove('open');
+  document.body.style.overflow = 'auto';
 }

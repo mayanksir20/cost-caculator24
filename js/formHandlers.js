@@ -3,6 +3,9 @@
 import { fetchStates, fetchLocations, postFormData } from './api.js';
 import { collectFormData, calculateTotalEmployees } from './utils.js';
 
+//import { fetchStates, fetchLocations, postFormData } from './api.js';
+//import { collectFormData, calculateTotalEmployees } from './utils.js';
+
 // Initialize dropdowns on page load
 export function initializeDropdowns() {
   fetchStates()
@@ -50,8 +53,42 @@ export function addInputListener(inputElement, label) {
   });
 }
 
-
 // Submit form data on button click with corrected error handling
+
+// export function handleSubmitButton(apiUrl) {
+//   const submitButton = document.getElementById('submitButton');
+
+//   submitButton.addEventListener('click', async (event) => {
+//     event.preventDefault();
+//     const formData = collectFormData();
+
+//     console.log(`form data ${formData.f11}`);
+//     // console.log(`form data ${JSON.stringify(formData)}`);
+//     // console.log(`form data ${collectFormData}`);
+
+//     try {
+//       const { ok, status, data } = await postFormData(apiUrl, formData);
+
+//       if (ok) {
+//         const payload = {
+//           data,
+//           f11: formData.f11, // Include formData.f11
+//         };
+
+//         window.name = JSON.stringify(payload);
+
+//         window.location.href = '../result.html';
+//       } else {
+//         alert(`Error::: ${data.message || 'An error occurred while submitting the form.'}`);
+//       }
+//     } catch (error) {
+//       alert(`Network error occurred. Details: ${error.message}`);
+//     }
+//   });
+// }
+
+
+
 export function handleSubmitButton(apiUrl) {
   const submitButton = document.getElementById('submitButton');
 
@@ -66,15 +103,21 @@ export function handleSubmitButton(apiUrl) {
 
       if (ok) {
         const payload = {
-          data,             // API response data
-          f11: formData.f11 // Include formData.f11
+          data,
+          f11: formData.f11, // Include formData.f11
         };
 
-        // ✅ Store data in localStorage instead of window.name
-        localStorage.setItem('resultData', JSON.stringify(payload));
+        // ✅ Save data to localStorage
+        localStorage.setItem('formData', JSON.stringify(payload));
 
-        // ✅ Redirect to result.html
+        // ✅ Redirect to result page
         window.location.href = '../result.html';
+
+
+
+
+
+        
       } else {
         alert(`Error::: ${data.message || 'An error occurred while submitting the form.'}`);
       }
@@ -83,6 +126,8 @@ export function handleSubmitButton(apiUrl) {
     }
   });
 }
+
+
 
 // --------submit-button-validation--
 

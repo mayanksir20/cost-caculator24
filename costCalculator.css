@@ -2,7 +2,8 @@ body,
 html {
   margin: 0;
   padding: 0;
-  background-color: #ededed;
+  /* background-color: #ededed; */
+  font-family: aptos narrow !important;
 }
 
 .header .header-announcement-bar-wrapper {
@@ -61,7 +62,7 @@ html {
   text-decoration: none;
   font-weight: 500;
   font-size: 17px;
-  font-family: sans-serif;
+  font-family: aptos narrow;
 }
 
 .site-navbar ul li a.active {
@@ -130,7 +131,8 @@ html {
 
 .btn-custom,
 .print-button,
-.learn-more-button {
+.learn-more-button,
+.send-mailbtn {
   background-color: #9c8b7e;
   color: #fff;
   border: none;
@@ -139,9 +141,10 @@ html {
   font-weight: 500;
 }
 
-.btn-custom,
-.print-button,
-.learn-more-button:hover {
+.btn-custom:hover,
+.print-button:hover,
+.learn-more-button:hover,
+.send-mailbtn:hover {
   background-color: #b3a49a;
 }
 
@@ -173,7 +176,6 @@ html {
 }
 
 @media screen and (max-width: 992px) {
-
   /* navbar css for mobile start */
   .nav-toggler {
     display: block;
@@ -255,13 +257,15 @@ html {
 .heading-upper {
   color: #9c8b7e;
 }
-
+.city-county p {
+  margin-bottom: unset !important;
+}
 .label-content p {
-  font-size: 15px;
+  font-size: 16px;
   padding: 0px 4px;
   color: #2c2c2c;
   margin-bottom: 10px;
-  font-weight: 500;
+  font-weight: 600;
   margin-top: 20px;
 }
 
@@ -317,15 +321,16 @@ html {
   font-size: 16px;
   color: #626161;
   text-align: justify;
+  padding: 0px 17px;
 }
 
 .para-heading {
   font-size: 30px;
-  font-family: 'Roboto', sans-serif;
+  font-family: aptos narrow;
 }
 
 .inner-heading {
-  font-family: math;
+  font-family: aptos narrow;
 }
 
 /* ----info-icon--message-------- */
@@ -364,7 +369,7 @@ html {
 }
 
 .info-text {
-  font-family: system-ui;
+  font-family: aptos narrow;
   background: #00ffff66;
   padding: 8px;
   border-radius: 10px;
@@ -427,6 +432,30 @@ html {
     display: inline-block;
   }
 }
+.print-container {
+  width: 100%;
+}
+
+#monthSaving,
+#YearlySaving,
+#Action {
+  width: 100% !important;
+  max-height: 200px !important; /* ✅ Fix max chart height */
+}
+
+.top-headerresult img {
+  position: relative;
+  top: 10px;
+  width: 300px;
+}
+@media (max-width: 600px) {
+  .top-headerresult img {
+    width: 165px;
+  }
+  .city-county p {
+    font-size: 18px !important;
+  }
+}
 
 @media (max-width: 1080px) {
   .ellipsis-text {
@@ -451,7 +480,7 @@ html {
   width: 100%;
   border-collapse: collapse;
   margin: 20px 0;
-  font-family: Arial, sans-serif;
+  font-family: aptos narrow;
 }
 
 .data-table th,
@@ -511,10 +540,14 @@ footer {
 .chart-subtitle {
   font-size: 14px;
   text-align: center;
-  font-style: italic;
-  color: #7d7d7d;
+  color: #6e6e6e;
   position: relative;
   bottom: 10px;
+}
+
+.card {
+  border: 1px solid #cacaca;
+  border-radius: 5px;
 }
 
 /* ---$action--chart-css------- */
@@ -538,10 +571,6 @@ footer {
   height: 10px;
   margin-right: 5px;
   display: inline-block;
-}
-
-#YearlySaving {
-  height: 300px !important;
 }
 
 .form-select,
@@ -585,32 +614,28 @@ footer {
 /* --------result-page--css-------- */
 
 .chart-container {
-  background: #ffffff;
   padding: 15px;
   border-radius: 8px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #cacaca;
 }
 
 .chart-title {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 5px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
 }
 
-.summary-container {
-  margin-top: 40px;
+.summary-Card {
   padding: 20px;
-  background: #f8f9fa;
   border-radius: 8px;
-  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
-  text-align: left;
+  border: 1px solid #cfcfcf;
 }
 
-.summary-container p {
-  font-size: 16px;
+.summary-Card .summry-title {
   text-align: center;
-  margin-bottom: 2px;
+  font-size: 16px;
+  font-style: italic;
 }
 
 .button-container {
@@ -620,46 +645,65 @@ footer {
 }
 
 @media print {
-  .row {
-    display: flex !important;
-    flex-wrap: wrap !important;
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    zoom: 80%; /* ✅ Scale everything to fit one page */
   }
 
-  .col-md-6,
-  .col-md-3 {
-    flex: 1 1 50% !important;
-    max-width: 50% !important;
+  .chart-box {
+    width: 100% !important;
+    max-width: 100% !important;
     page-break-inside: avoid !important;
   }
 
-  .summary-container {
-    page-break-before: always;
+  .chart-container {
+    width: 100% !important;
+    height: auto !important;
+    text-align: center !important;
+    page-break-inside: avoid !important;
   }
 
+  /* ✅ Ensure charts remain readable */
+  canvas {
+    width: 100% !important;
+    
+  }
+
+  /* ✅ Fix layout of bottom 3 charts */
+  .col-md-6 {
+    width: 50% !important;
+    max-width: 50% !important;
+  }
+
+  .col-md-3 {
+    width: 25% !important;
+    max-width: 25% !important;
+  }
+
+  #monthSaving {
+    height: 200px !important;
+  }
+  
+
+  #YearlySaving {
+    height: 200px !important;
+  }
+
+  #Action {
+    height: 163px !important;
+    width: 200px !important;
+  }
+
+  /* ✅ Prevent page breaks inside charts */
+  .chart-container,
+  .summary-Card {
+    page-break-inside: avoid !important;
+  }
+
+  /* ✅ Remove elements that shouldn't be printed */
   .no-print {
     display: none !important;
-  }
-
-  .row > :nth-child(5) {
-    flex: 1 1 70% !important; 
-    max-width: 70% !important;
-    page-break-inside: avoid !important;
-  }
-  
-  .row > :nth-child(6) {
-    flex: 1 1 30% !important; 
-    max-width: 30% !important;
-    page-break-inside: avoid !important;
-  }
-  
-
-  .row> :nth-child(7) {
-    grid-column: span 1 !important;
-    width: 800px !important;
-  }
-
-  .legend-container {
-    margin-top: 0px !important;
   }
 
   header,
@@ -667,14 +711,32 @@ footer {
     display: none !important;
   }
 
-  #YearlySaving {
-    height: 130px !important;
+  /* ✅ Adjust font sizes for better print readability */
+  .chart-title {
+    font-size: 16px !important;
+    font-weight: bold !important;
   }
-  #Action{
-    height: 330px !important;
-  }
-}
 
+  .chart-subtitle {
+    font-size: 12px !important;
+  }
+
+  /* ✅ Summary Section Formatting */
+  .summary-Card {
+    width: 100% !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+  }
+
+  /* ✅ Reduce margins for better fit */
+  .legend-container {
+    margin-top: 0px !important;
+  }
+  .heading-upper{
+    font-size: 17px !important;
+  }
+  
+}
 
 #submitButton {
   padding: 10px 20px;
@@ -687,7 +749,6 @@ footer {
   color: #666;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
-
 
 #submitButton.enabled {
   background-color: #9c8b7e;
@@ -707,18 +768,22 @@ footer {
 }
 
 .mancolor {
-  color: #DC143C;
+  color: #dc143c;
 }
 
 .opthr {
-  border-top: 2px solid #4682B4;
+  border-top: 2px solid #4682b4;
 }
 
 .manhr {
-  border-top: 2px solid #FF4500;
+  border-top: 2px solid #ff4500;
 }
-
 
 .modal-body li {
   font-size: 18px;
+}
+.dynamic-legend {
+  display: flex !important;
+  white-space: nowrap;
+  flex-wrap: unset;
 }

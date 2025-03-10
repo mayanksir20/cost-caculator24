@@ -56,182 +56,164 @@
     </header>
 
 
+    <div class="chart">
+        <div class="caculator-content mt-5">
+            <h2 class="heading-upper text-center mt-5">Solid Waste & Recycling Cart Management</h2>
+            <h3 class="heading-upper text-center ">Internal Cost Calculator</h3>
 
-    <div class="caculator-content mt-5">
-        <h2 class="heading-upper text-center no-print mt-5">Solid Waste & Recycling Cart Management</h2>
-        <h3 class="heading-upper text-center no-print">Internal Cost Calculator</h3>
+            <div class="d-flex justify-content-between top-headerresult">
+                <span style="align-content: end;">
+                    <h4 class="chart-title city-county" id="cityOrCounty">City/County </h4>
+                    <p class="chart-subtitle mb-0" id="stateName">State</p>
+                </span>
 
-        <div class="d-flex justify-content-between">
-            <span>
-                <h4 class="chart-title" id="cityOrCounty">City/County </h4>
-                <p class="chart-subtitle mt-3" id="stateName">State</p>
-            </span>
+                <p class="chart-subtitle mt-3"><img src="images/Logo+with+Tagline--black-removebg-preview.png" width="300"/></p>
+            </div>
 
-            <p class="chart-subtitle mt-3"># VALUE</p>
-        </div>
 
-        <div class="chart-grid">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-title"># of Employees</div>
-                        <div>
-                            <canvas id="NoOfEmployee"></canvas>
+            <div class="chart-grid print-container">
+                <div class="row g-3">
+                    <div class="col-md-6 chart-box">
+                        <div class="chart-container">
+                            <div class="chart-title"># of Employees</div>
+                            <div>
+                                <canvas id="NoOfEmployee"></canvas>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 🔹 Legend Tooltip का div (Hidden by Default) -->
-                    <div id="legend-tooltip" style="
-                        display: none; 
-                        position: absolute;
-                        background: rgba(0, 0, 0, 0.8); 
-                        color: white; 
-                        padding: 5px; 
-                        border-radius: 4px; 
-                        font-size: 12px;
-                        white-space: nowrap;">
-                    </div>
-
-                </div>
-
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-title"># of Vehicles</div>
-                        <div>
-                            <canvas id="NoOfVehicles"></canvas>
+                    <div class="col-md-6 chart-box">
+                        <div class="chart-container">
+                            <div class="chart-title"># of Vehicles</div>
+                            <div>
+                                <canvas id="NoOfVehicles"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-title">Employee Costs</div>
-                        <div class="chart-subtitle">Per Month</div>
-                        <div>
-                            <canvas id="EmployeeCost"></canvas>
+                    <div class="col-md-6 chart-box">
+                        <div class="chart-container">
+                            <div class="chart-title">Employee Costs</div>
+                            <div class="chart-subtitle">Per Month</div>
+                            <div>
+                                <canvas id="EmployeeCost"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-title">Vehicle Costs</div>
-                        <div class="chart-subtitle">Per Month</div>
-                        <div>
-                            <canvas id="VehicleCost"></canvas>
+                    <div class="col-md-6 chart-box">
+                        <div class="chart-container">
+                            <div class="chart-title">Vehicle Costs</div>
+                            <div class="chart-subtitle">Per Month</div>
+                            <div>
+                                <canvas id="VehicleCost"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-6">
-                    <div class="chart-container">
-                        <div class="chart-title">Saving</div>
-                        <div class="chart-subtitle">Per Month</div>
-                        <div>
+                    <!-- ✅ Fix Layout for Bottom 3 Charts -->
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <div class="chart-title">Savings</div>
+                            <div class="chart-subtitle">Per Month</div>
                             <canvas id="monthSaving"></canvas>
                         </div>
                     </div>
-                </div>
 
-                <div class="col-md-2">
-                    <div class="chart-container" style="position: relative;">
-                        <div class="chart-title">Saving</div>
-                        <div class="chart-subtitle">Per Year</div>
-                        <div>
+                    <div class="col-md-3 chart-box">
+                        <div class="chart-container" style="position: relative; text-align: center;">
+                            <div class="chart-title">Savings</div>
+                            <div class="chart-subtitle">Per Year</div>
                             <canvas id="YearlySaving"></canvas>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="chart-container">
-                        <div class="chart-title">$/Action</div>
-                        <div class="chart-container" style="position: relative; width: 100%; max-width: 600px;">
+
+                    <div class="col-md-3 chart-box">
+                        <div class="chart-container" style="text-align: center; padding: 6px; text-align: -webkit-center;">
+                            <div class="chart-title">$/Action</div>
                             <canvas id="Action"></canvas>
                         </div>
                     </div>
-                </div>
 
+                    <div class="summary-Card">
+                        <p class="summry-title">All costs are calculated on a <strong>Gross Margin</strong> (Operating)
+                            basis
+                            <u>without</u>
+                            allocating SG&A or adding a profit margin<br>
+                            <span id="Summary2"></span>
+                        </p>
+                        <h3 class="chart-title" style="text-align: left; font-size: 24px;">Summary</h3>
+                        <hr class="mt-0">
+                        <p class="chart-subtitle mt-3" id="Summary1" style="text-align: justify; font-size: 16px;"></p>
 
-                <div class="summary-container no-print">
-                    <p><em>All costs are calculated on a <strong>Gross Margin</strong> Operating basis <u>without</u>
-                            allocating SG&A or adding a profit margin </em></p>
-                    <p>
-                        The fully burdened wage rates used to calculate the hourly cost of the Escambia County Field
-                        Technicians was <strong>$75.51</strong>
-                    </p>
+                        <div class="button-container no-print">
+                            <button class="print-button py-2 " id="printButton"><i
+                                    class="fa-solid fa-print"></i>&nbsp;Print</button>
+                            <button class="learn-more-button py-2" data-bs-toggle="modal"
+                                data-bs-target="#simpleModal">Learn More</button>
+                        </div>
 
-                    <h3 class="chart-title" style="text-align: left;">Summary</h3>
-                    <p class="chart-subtitle mt-3" style="text-align: left;">
-                        Based on our analysis of the data provided, the housing density of Hillsborough County and the
-                        operational efficiency of the approach used National Cart Services to manage carts, we estimate
-                        our team can complete 35 actions per day per employee compared to your average of 18 which
-                        results in 3 fewer employees and 3 fewer vehicles needed to complete actions in the field within
-                        24 hours. Since labor and vehicle costs are the main contributors to the Cost of Service (CoS),
-                        this efficiency improvement translates to <strong>$2,940,541</strong> in annual Gross Margin
-                        savings.
-                    </p>
-
-
-
-                    <div class="button-container">
-                        <button class="print-button py-2" style="color: rgb(63, 63, 63);"><i
-                                class="fa-solid fa-print"></i>&nbsp;Print</button>
-
-                        <button class="learn-more-button py-2" data-bs-toggle="modal"
-                            data-bs-target="#simpleModal">Learn More</button>
+                        <p class="mb-0 mt-3">
+                            <strong>Source (Wages):</strong> The US Bureau of Labor & Statistics: Employer Costs for
+                            Employee
+                            Compensation, Quarterly Update
+                        </p>
                     </div>
-
-                    <p style="text-align: left; margin-top: 20px;">
-                        <strong>Source (Wages):</strong> The US Bureau of Labor & Statistics: Emplyer Costs for Employee
-                        Compensation, Quarterly Update
-                    </p>
-
                 </div>
             </div>
 
+
         </div>
-    </div>
-    <div class="modal fade" id="simpleModal" tabindex="-1" aria-labelledby="simpleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <!-- Modal Body -->
-                <h3 class="modal-title text-center" id="simpleModalLabel">Cost Calculator “Learn More” email</h3>
-                <div class="modal-body px-5 py-2">
-                    <h4>Instructions:</h4>
-                    <ul>
-                        <li>Clicking on the button should prompt the user to enter their email address, First Name, Last
-                            Name, and Organization, and should extract the city/county and state entered in the
-                            calculator to pre-populate the form email below.</li>
-                        <li>The user should be able to modify or add to the pre-populated text below.</li>
-                        <li>The email should be sent to <strong>sales@nationalcartservices.com</strong>.</li>
-                    </ul>
 
-                    <p><b>Subject: [CITY/COUNTY], [STATE] – </b>Discuss Internal Cost Calculator Discussion</p>
-
-                    <p>
-                        Dear National Cart Services,<br>
-                        Please contact me to set up a day and time for a meeting to discuss the output generated by your
-                        Internal Cost Calculator for <b>[CITY/COUNTY], [STATE].</b>
-
-                    </p>
-                    <p>
-                        <b>Sincerely,</b><br>
-                        [FIRST NAME] [LAST NAME]<br>
-                        [ORGANIZATION]
-
-                    </p>
-                </div>
-
-                <!-- Modal Footer -->
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <div class="modal fade" id="simpleModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-l">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalLabel">Request Meeting</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body label-content">
+                        <form id="emailRequestForm">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <p for="firstName" class="form-label">First Name:</p>
+                                    <input type="text" class="form-control" id="firstName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p for="lastName" class="form-label">Last Name:</p>
+                                    <input type="text" class="form-control" id="lastName" required>
+                                </div>                               
+                                <div class="col-md-6">
+                                    <p for="organization" class="form-label">Organization:</p>
+                                    <input type="text" class="form-control" id="organization" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p for="email" class="form-label">Email Address:</p>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p for="city" class="form-label">City/County:</p>
+                                    <input type="text" class="form-control" id="formCityCounty" value="" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <p for="state" class="form-label">State:</p>
+                                    <input type="text" class="form-control" id="state" required value="">
+                                </div>
+                                <div class="col-md-12">
+                                    <p for="message" class="form-label">Message:</p>
+                                    <textarea class="form-control" id="message" rows="5"></textarea>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button type="button" class="send-mailbtn py-2" onclick="populateModalForm()">Send
+                                    Email</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+
     </div>
     <footer class="mt-5">
         <p class="mt-3">&copy; 2025 National Cart Services. All rights reserved.</p>
@@ -239,18 +221,23 @@
 
 
     <script>
-        document.querySelector(".print-button").addEventListener("click", function () {
-            window.print();
-        });
-
-
-
+        // document.querySelector(".print-button").addEventListener("click", function () {
+        //     window.print();
+        // });
     </script>
 
     <!-- <script type="module" src="./js/costCalculator.js" defer></script> -->
     <script type="module" src="./js/chartLoader.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="./js/form.js"></script>
+    <!-- Server 
+  <script type="module" src="./js/chartLoader.obfuscated.js"></script> 
+  <script type="module" src="./js/form.js"></script>
+    -->
 </body>
 
 </html>
+
+
+

@@ -190,5 +190,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
- 
+// Force page refresh when using the browser's back button
+window.addEventListener('pageshow', function (event) {
+  if (event.persisted) {
+    console.log('Page loaded from cache, forcing reload');
+    window.location.reload();
+  }
+});

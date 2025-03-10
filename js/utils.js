@@ -75,3 +75,5 @@ export function calculateTotalEmployees() {
 
   // console.log(`Total Employees: ${total}`);
 }
+
+
